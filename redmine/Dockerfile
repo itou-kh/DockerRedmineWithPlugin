@@ -29,7 +29,6 @@ RUN set -eux; \
         ; \
         \
 # install plugins
-        # gosu redmine git clone --depth 1 https://github.com/gelin/plantuml-redmine-macro.git plugins/plantuml_macro; \
         gosu redmine git clone --depth 1 https://github.com/redmica/redmica_ui_extension.git plugins/redmica_ui_extension; \
         gosu redmine git clone --depth 1 https://github.com/mikitex70/redmine_drawio.git plugins/redmine_drawio; \
         \
