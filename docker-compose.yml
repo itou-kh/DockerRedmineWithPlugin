@@ -1,55 +1,60 @@
-version: '3.8'
+version: "3.7"
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: redmine_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: redmine
-      MYSQL_USER: redmine
-      MYSQL_PASSWORD: redmine
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - redmine_network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "redmine", "-predmine"]
-      timeout: 20s
-      retries: 10
 
   redmine:
-    build: .
-    container_name: redmine_app
+    build: ./redmine
+    container_name: myfav-redmine
     restart: always
+    depends_on:
+      - db
+      - chupa-text
     ports:
       - "3000:3000"
     environment:
-      REDMINE_DB_MYSQL: db
-      REDMINE_DB_DATABASE: redmine
-      REDMINE_DB_USERNAME: redmine
-      REDMINE_DB_PASSWORD: redmine
-      REDMINE_SECRET_KEY_BASE: supersecretkey
-      RAILS_ENV: production
+      TZ: Asia/Tokyo
+      REDMINE_DB_POSTGRES: db
+      REDMINE_DB_DATABASE: redminedb
+      REDMINE_DB_USERNAME: redmineuser
+      REDMINE_DB_PASSWORD: redminepassword
+      REDMINE_PLUGINS_MIGRATE: "true"
     volumes:
-      - redmine_files:/usr/src/redmine/files
-      - redmine_plugins:/usr/src/redmine/plugins
-      - redmine_themes:/usr/src/redmine/public/themes
-      - redmine_logs:/usr/src/redmine/log
+      - "/srv/redmine/files:/usr/src/redmine/files:z"
+      - "/var/log/redmine:/usr/src/redmine/log:z"
+
+  db:
+    build: ./db
+    container_name: myfav-redmine-db
+    restart: always
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_DB: redminedb
+      POSTGRES_USER: redmineuser
+      POSTGRES_PASSWORD: redminepassword
+    volumes:
+      - "dbdata:/var/lib/postgresql/data"
+
+  chupa-text-proxy:
+    image: groonga/chupa-text:proxy
+    container_name: myfav-redmine-chupa-text-proxy
+    restart: always
+    environment:
+      TZ: Asia/Tokyo
+    volumes:
+      - "/var/log/redmine-chupa-text/proxy:/var/log/squid:z"
+  chupa-text:
+    image: groonga/chupa-text:ubuntu-latest
+    container_name: myfav-redmine-chupa-text
+    restart: always
     depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - redmine_network
+      - chupa-text-proxy
+    environment:
+      TZ: Asia/Tokyo
+      http_proxy: http://chupa-text-proxy:3128/
+      https_proxy: http://chupa-text-proxy:3128/
+      RAILS_SERVE_STATIC_FILES: "true"
+    volumes:
+      - "/var/log/redmine-chupa-text/rails:/home/chupa-text/chupa-text-http-server/log:z"
 
 volumes:
-  db_data:
-  redmine_files:
-  redmine_plugins:
-  redmine_themes:
-  redmine_logs:
-
-networks:
-  redmine_network:
-    driver: bridge
+  dbdata:
