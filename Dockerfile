@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     git \
     wget \
     unzip \
+    mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # プラグインディレクトリに移動
@@ -21,18 +22,13 @@ RUN git clone https://github.com/mikitex70/redmine_drawio.git
 WORKDIR /usr/src/redmine
 RUN bundle install --without development test
 
-# データベースマイグレーションとプラグインのインストールスクリプトをコピー
-COPY install_plugins.sh /usr/src/redmine/
-RUN chmod +x /usr/src/redmine/install_plugins.sh
+# カスタムエントリーポイントスクリプトをコピー
+COPY docker-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
+RUN chmod +x /usr/local/bin/custom-entrypoint.sh
 
 # Redmineユーザーに戻す
 USER redmine
 
-# エントリーポイントスクリプトをコピー
-COPY docker-entrypoint.sh /usr/local/bin/
-USER root
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-USER redmine
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# 公式エントリーポイントを保持しつつ、カスタムスクリプトを実行
+ENTRYPOINT ["/usr/local/bin/custom-entrypoint.sh"]
 CMD ["rails", "server", "-b", "0.0.0.0"]

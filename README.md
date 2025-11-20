@@ -110,6 +110,28 @@ docker-compose logs -f db
 
 ## トラブルシューティング
 
+### データベース接続エラーの場合
+
+**症状**: `Cannot load database configuration: No such file - ["config/database.yml"]`
+
+**原因**: データベース設定ファイルが正しく生成されていない
+
+**対処法**:
+1. コンテナを完全に停止：
+```bash
+docker-compose down -v
+```
+
+2. イメージを再ビルド：
+```bash
+docker-compose build --no-cache
+```
+
+3. 再起動：
+```bash
+docker-compose up -d
+```
+
 ### プラグインが表示されない場合
 
 1. コンテナのログを確認：
@@ -122,9 +144,25 @@ docker-compose logs redmine
 docker-compose exec redmine bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 ```
 
-### データベース接続エラーの場合
+### 初回起動が遅い場合
 
-データベースコンテナが完全に起動するまで待機してください。初回起動時は特に時間がかかります。
+データベースの初期化とプラグインのセットアップには5-10分程度かかる場合があります。以下のコマンドで進行状況を確認できます：
+
+```bash
+docker-compose logs -f redmine
+```
+
+### コンテナが起動しない場合
+
+1. データベースのヘルスチェック状態を確認：
+```bash
+docker-compose ps
+```
+
+2. データベースログを確認：
+```bash
+docker-compose logs db
+```
 
 ## カスタマイズ
 

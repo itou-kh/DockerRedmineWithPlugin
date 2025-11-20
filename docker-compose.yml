@@ -14,25 +14,32 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - redmine_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "redmine", "-predmine"]
+      timeout: 20s
+      retries: 10
 
   redmine:
     build: .
     container_name: redmine_app
     restart: always
     ports:
-      - "8080:3000"
+      - "3000:3000"
     environment:
       REDMINE_DB_MYSQL: db
       REDMINE_DB_DATABASE: redmine
       REDMINE_DB_USERNAME: redmine
       REDMINE_DB_PASSWORD: redmine
       REDMINE_SECRET_KEY_BASE: supersecretkey
+      RAILS_ENV: production
     volumes:
       - redmine_files:/usr/src/redmine/files
       - redmine_plugins:/usr/src/redmine/plugins
       - redmine_themes:/usr/src/redmine/public/themes
+      - redmine_logs:/usr/src/redmine/log
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - redmine_network
 
@@ -41,6 +48,7 @@ volumes:
   redmine_files:
   redmine_plugins:
   redmine_themes:
+  redmine_logs:
 
 networks:
   redmine_network:
