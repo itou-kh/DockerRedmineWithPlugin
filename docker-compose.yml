@@ -28,8 +28,8 @@ services:
     environment:
       TZ: Asia/Tokyo
       POSTGRES_DB: redminedb
-      POSTGRES_USER: redmineuser
-      POSTGRES_PASSWORD: redminepassword
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
     volumes:
       - "dbdata:/var/lib/postgresql"
 
