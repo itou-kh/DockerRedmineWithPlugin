@@ -31,7 +31,7 @@ services:
       POSTGRES_USER: redmineuser
       POSTGRES_PASSWORD: redminepassword
     volumes:
-      - "dbdata:/var/lib/postgresql/data"
+      - "dbdata:/var/lib/postgresql"
 
 volumes:
   dbdata:
