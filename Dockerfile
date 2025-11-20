@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /usr/src/redmine/plugins
 
 # Mermaidプラグインをインストール
-RUN git clone https://github.com/mikitex70/redmine_mermaid_macro.git
+RUN git clone https://github.com/redmica/redmica_ui_extension.git
 
 # DrawIOプラグインをインストール
 RUN git clone https://github.com/mikitex70/redmine_drawio.git
