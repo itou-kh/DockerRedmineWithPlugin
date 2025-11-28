@@ -14,8 +14,8 @@ services:
       TZ: Asia/Tokyo
       REDMINE_DB_POSTGRES: db
       REDMINE_DB_DATABASE: redminedb
-      REDMINE_DB_USERNAME: root
-      REDMINE_DB_PASSWORD: root
+      REDMINE_DB_USERNAME: redmineuser
+      REDMINE_DB_PASSWORD: redminepassword
       REDMINE_PLUGINS_MIGRATE: "true"
     volumes:
       - "/srv/redmine/files:/usr/src/redmine/files:z"
@@ -28,8 +28,8 @@ services:
     environment:
       TZ: Asia/Tokyo
       POSTGRES_DB: redminedb
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_USER: redmineuser
+      POSTGRES_PASSWORD: redminepassword
     volumes:
       - "dbdata:/var/lib/postgresql"
 
